@@ -3,22 +3,21 @@
 
 int main(int argc, char **argv)
 {
-    size_t bufsize = 64;
-    size_t characters;
-    char *command;
-
-    buffer = (char *)malloc(bufsize * sizeof(char));
+  size_t bufsize = 64;
+  size_t characters;
+  char *command;
   
-    if(buffer == null){
-        perror("Unable to allocate buffer");
-        exit(1)
-    }
+  command = (char *)malloc(bufsize * sizeof(char));
+  
+  if(command == NULL){
+    perror("Unable to allocate buffer");
+    exit(1);
+  }
 
-    char *prompt =  "vish... $";
-    printf("%s ", prompt);
+  char *prompt =  "vish... $";
+  printf("%s ", prompt);
     
-    characters = getline(&buffer,&bufsize,stdin);
+  characters = getline(&command,&bufsize,stdin);
     
-
-    return 0;
+  return 0;
 }
