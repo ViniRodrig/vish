@@ -1,9 +1,19 @@
+/*  Vinícius Marques Rodrigues - 790717 
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h> 
 #include <signal.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
+int fd;
+
+
+// Calls execve with the command array
 
 void exec_command(char **token_array){
   char *command = NULL;
@@ -24,7 +34,10 @@ void parser_fork(char **token_array, int token_count){
   
   int pid;
   char *ampersand = "&";
-  if (strcmp(token_array[token_count-2], ampersand) == 0){
+  char *redirect_output = ">";
+
+  // verify if there's a ampersand in the last token
+  if ((token_count > 2) && (strcmp(token_array[token_count-2], ampersand) == 0)){
     token_array[token_count-2] = '\0';
     pid = fork();
     if (pid == 0){
@@ -32,9 +45,26 @@ void parser_fork(char **token_array, int token_count){
     } else {
       signal(SIGCHLD, SIG_IGN);
     }
-  } 
-  else
-  {
+  // verify if there's a > to redirect to a file in the last but one 
+  } else if ((token_count > 3) &&(strcmp(token_array[token_count-3], redirect_output) == 0)){
+    token_array[token_count-3] = '\0';
+
+    pid = fork();
+    if (pid == 0 ){
+      
+      // Create the file and change the stdout to the file created
+      int file_desc = open(token_array[token_count-2],O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
+      dup2(file_desc, 1); 
+      
+      // Run the command
+      exec_command(token_array);
+      
+      // Close the file
+      close(file_desc);
+    } else {
+      wait(NULL);
+    }
+  } else  { // base case, nothin to do but exec the command
     pid = fork();
     if (pid == 0 ){
       exec_command(token_array);
