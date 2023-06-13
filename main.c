@@ -10,7 +10,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-int fd;
 
 
 // Calls execve with the command array
